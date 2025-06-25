@@ -5,7 +5,8 @@ const {
   addProduct,
   deleteProduct,
   updateProduct,
-  getSingleProduct
+  getSingleProduct,
+  getVendorProducts,
 } = require("../controllers/productController");
 const protect = require("../middleware/authMiddleware");
 const adminOnly = require("../middleware/adminMiddleware");
@@ -26,14 +27,17 @@ router.delete("/:id", protect, deleteProduct);
 // router.put("/:id", protect, adminOnly, updateProduct);
 router.put("/:id", protect, updateProduct);
 
-router.get("/vendor", protect, async (req, res) => {
-  try {
-    const vendorId = req.user._id;
-    const products = await Product.find({ createdBy: vendorId });
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error });
-  }
-});
+// router.get("/vendor", protect,  async (req, res) => {
+//   try {
+//     const vendorId = req.user._id;
+//     const products = await Product.find({ createdBy: vendorId });
+//     res.json(products);
+//   } catch (error) {
+//     res.status(500).json({ message: "Server Error", error });
+//   }
+// });
+
+router.get("/vendor", protect, getVendorProducts);
+
 
 module.exports = router;

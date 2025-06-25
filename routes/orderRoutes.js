@@ -49,17 +49,6 @@ router.get("/", protect, getOrders);
 // Get All Orders (For Admin)
 router.get("/all", protect, getAllOrders);
 
-// GET /api/orders/vendor
-// router.get("/vendor", protect, async (req, res) => {
-//   try {
-//     const vendorId = req.user._id;
-//     const orders = await Order.find({ "items.createdBy": vendorId });
-//     res.json(orders);
-//   } catch (error) {
-//     res.status(500).json({ message: "Server Error", error });
-//   }
-// });
-
 router.get("/vendor", protect, getVendorOrders);
 
 // Update Order Status

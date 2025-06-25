@@ -57,33 +57,6 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-// const updateProduct = async (req, res) => {
-//   try {
-//     const product = await Product.findById(req.params.id);
-//     if (!product) return res.status(404).json({ message: "Product not found" });
-
-//     const isOwner = product.createdBy?.toString() === req.user._id.toString();
-//     const isAdmin = req.user.isAdmin;
-
-//     if (!isOwner && !isAdmin) {
-//       return res.status(403).json({ message: "Not authorized to update" });
-//     }
-
-//     const { name, price, category, description, image } = req.body;
-
-//     if (name) product.name = name;
-//     if (price) product.price = price;
-//     if (category) product.category = category;
-//     if (description) product.description = description;
-//     if (image) product.image = image;
-
-//     await product.save();
-
-//     res.json({ message: "Product updated successfully!" });
-//   } catch (error) {
-//     res.status(500).json({ message: "Server Error", error: error.message });
-//   }
-// };
 
 const updateProduct = async (req, res) => {
   try {
@@ -138,6 +111,19 @@ const getSingleProduct = async (req, res) => {
   }
 };
 
+
+// ✅ Get Products Created by Current Vendor
+const getVendorProducts = async (req, res) => {
+  try {
+    const vendorId = req.user._id;
+    const products = await Product.find({ createdBy: vendorId });
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
+
+
 // ✅ Export All
 module.exports = {
   getProducts,
@@ -145,4 +131,5 @@ module.exports = {
   deleteProduct, // ✅ now available in routes
   updateProduct, // ✅ now available in routes
   getSingleProduct, // ✅ now available in routes
+  getVendorProducts, // ✅ now available in routes
 };
