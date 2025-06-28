@@ -6,6 +6,8 @@ const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const productRoutes = require("./routes/productRoutes");
+const recommendationRoutes = require("./routes/recommendationRoutes");
+
 
 
 
@@ -13,6 +15,8 @@ const productRoutes = require("./routes/productRoutes");
 // Initialize Express app
 dotenv.config();  // Load environment variables
 const app = express();
+app.use(express.urlencoded({ extended: true })); // ✅ Parse x-www-form-urlencoded (for SSLCommerz)
+
 
 // Middleware setup
 app.use(cors());  // Enable Cross-Origin Resource Sharing
@@ -24,6 +28,12 @@ app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/products", productRoutes);
+
+// Add the recommendation routes
+app.use("/api/recommend", recommendationRoutes);
+
+app.use("/api/reviews", require("./routes/reviewRoutes"));
+
 
 
 

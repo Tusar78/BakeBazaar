@@ -99,9 +99,21 @@ const initiatePayment = async (req, res) => {
       total_amount: totalPrice,
       currency: "BDT",
       tran_id: `TXN_${Date.now()}`,
-      success_url: "http://localhost:5000/api/payment/success",
-      fail_url: "http://localhost:5000/api/payment/fail",
-      cancel_url: "http://localhost:5000/api/payment/cancel",
+      // success_url: `${BASE_URL}/api/payment/success`,
+      // fail_url: `${BASE_URL}/api/payment/fail`,
+      // cancel_url: `${BASE_URL}/api/payment/cancel`,
+      // success_url: `${process.env.SERVER_BASE_URL}/api/payment/success`,
+      // fail_url: `${process.env.SERVER_BASE_URL}/api/payment/fail`,
+      // cancel_url: `${process.env.SERVER_BASE_URL}/api/payment/cancel`,
+
+      success_url:
+        "https://bakebazaar-backend.onrender.com/api/payment/success",
+      fail_url: "https://bakebazaar-backend.onrender.com/api/payment/fail",
+      cancel_url: "https://bakebazaar-backend.onrender.com/api/payment/cancel",
+
+      // success_url: "http://localhost:5000/api/payment/success",
+      // fail_url: "http://localhost:5000/api/payment/fail",
+      // cancel_url: "http://localhost:5000/api/payment/cancel",
       cus_name: req.user.name,
       cus_email: req.user.email,
       cus_add1: "Dhaka",
@@ -124,18 +136,62 @@ const initiatePayment = async (req, res) => {
 };
 
 // ✅ Handle Payment Success
-const paymentSuccess = async (req, res) => {
-  try {
-    const { tran_id, value_a } = req.body; // value_a = orderId
-    const order = await Order.findById(value_a);
+// const paymentSuccess = async (req, res) => {
+//   try {
+//     console.log("✔️ Payment Success Body:", req.body);
 
+//     const { tran_id, value_a } = req.body; // value_a = orderId
+//     const order = await Order.findById(value_a);
+
+//     if (!order) return res.status(404).json({ message: "Order not found" });
+
+//     order.paymentStatus = "Paid";
+//     order.transactionId = tran_id;
+//     await order.save();
+
+//     res.redirect("http://localhost:5173/dashboard"); // Redirect to User Dashboard
+//   } catch (error) {
+//     console.error("🔴 Payment Success Error:", error);
+//     res.status(500).json({ message: "Payment Success Handling Failed", error });
+//   }
+// };
+
+const paymentSuccess = async (req, res) => {
+  console.log("🔔 SSLCommerz Success Callback Hit");
+  console.log("req.body:", req.body);
+  console.log("req.query:", req.query);
+
+  try {
+    const tran_id = req.body?.tran_id || req.query?.tran_id;
+    const orderId = req.body?.value_a || req.query?.value_a;
+
+    console.log("✅ orderId:", orderId);
+    console.log("✅ tran_id:", tran_id);
+
+    if (!orderId) {
+      console.error("❌ Order ID not received");
+      return res.status(400).json({ message: "Order ID missing" });
+    }
+
+    const order = await Order.findById(orderId);
     if (!order) return res.status(404).json({ message: "Order not found" });
 
     order.paymentStatus = "Paid";
     order.transactionId = tran_id;
     await order.save();
 
-    res.redirect("http://localhost:5173/dashboard"); // Redirect to User Dashboard
+    // res.redirect("http://localhost:5173/dashboard");
+    // res.redirect(
+    //   `${process.env.BASE_URL}/payment-success`
+    // );
+
+    const isWeb = req.headers["user-agent"]?.includes("Mozilla");
+
+    if (isWeb) {
+      res.redirect("http://localhost:5173/payment-success"); // web version
+    } else {
+      res.redirect("bakebazar://payment-success");
+    }
   } catch (error) {
     console.error("🔴 Payment Success Error:", error);
     res.status(500).json({ message: "Payment Success Handling Failed", error });
@@ -153,7 +209,7 @@ const paymentFailure = async (req, res) => {
       await order.save();
     }
 
-    res.redirect("http://localhost:5173/cart"); // Redirect to Cart Page
+    res.redirect("bakebazar://custome/Cart"); // Redirect to Cart Page
   } catch (error) {
     console.error("🔴 Payment Failure Error:", error);
     res.status(500).json({ message: "Payment Failure Handling Failed", error });

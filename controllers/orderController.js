@@ -2,16 +2,35 @@ const Order = require("../models/Order");
 
 const Product = require("../models/Product");
 
+// const placeOrder = async (req, res) => {
+//   try {
+//     const { items, totalPrice } = req.body;
+//     const newOrder = new Order({ user: req.user._id, items, totalPrice });
+//     await newOrder.save();
+//     res.status(201).json({ 
+//       message: "Order Placed Successfully!",
+//       orderId: order._id, 
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: "Server Error", error: error.message });
+//   }
+// };
+
 const placeOrder = async (req, res) => {
   try {
     const { items, totalPrice } = req.body;
     const newOrder = new Order({ user: req.user._id, items, totalPrice });
     await newOrder.save();
-    res.status(201).json({ message: "Order Placed Successfully!" });
+    res.status(201).json({ 
+      message: "Order Placed Successfully!",
+      orderId: newOrder._id, 
+    });
   } catch (error) {
+    console.error("❌ Order Placement Error:", error);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 
 const getOrders = async (req, res) => {
   try {
